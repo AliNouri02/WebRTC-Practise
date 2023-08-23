@@ -27,6 +27,26 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("update-user-list", { users: [socket.id] })
     }
 
+    socket.on("call-user", (data) => {
+        socket.to(data.to).emit("call-made", {
+            offer: data.offer,
+            socket: socket.id,
+        });
+    });
+
+    socket.on("make-awnser", data => {
+        socket.to(data.to).emit("answer-made", {
+            socket: socket.id,
+            answer: data.answer
+        })
+    })
+
+    socket.on("reject-call", data => {
+        socket.to(data.from).emit("call-rejected", {
+            socket: socket.id
+        })
+    })
+
     socket.on("disconnect", () => {
         activeUsers = activeUsers.filter(
             socketExist => socketExist !== socket.id
